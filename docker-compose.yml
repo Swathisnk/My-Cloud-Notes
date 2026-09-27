@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: cloudnote_web
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      # Map the SQLite database to survive container teardowns
+      - ./db.sqlite3:/app/db.sqlite3
+      # Map the media directory where note uploads are stored
+      - ./media:/app/media
+    environment:
+      - DEBUG=False
+      - ALLOWED_HOSTS=*

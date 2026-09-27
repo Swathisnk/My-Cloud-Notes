@@ -1,0 +1,186 @@
+{% extends 'notes/base.html' %}
+{% block title %}CloudNote - College Notes Sharing Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-center text-lg-start">
+    <div class="hero-bg-shapes">
+        <div class="hero-circle-1"></div>
+        <div class="hero-circle-2"></div>
+    </div>
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-5 mb-lg-0">
+                <span class="hero-badge"><i class="bi bi-stars"></i> Shared Knowledge, Smarter Learning</span>
+                <h1 class="hero-title">
+                    The Smart Way to <br><span>Share & Discover</span> College Notes.
+                </h1>
+                <p class="hero-subtitle">
+                    Access premium PDFs and Word documents uploaded by fellow students. Organize, search, and download academic resources all in one place.
+                </p>
+                <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start gap-3">
+                    <a href="#explore-section" class="btn btn-premium py-3 px-4">
+                        <i class="bi bi-search me-2"></i> Explore Notes
+                    </a>
+                    <a href="{% url 'upload' %}" class="btn btn-premium-outline py-3 px-4">
+                        <i class="bi bi-cloud-upload me-2"></i> Upload a Note
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center d-none d-lg-block">
+                <!-- Visual SVG Graphic -->
+                <svg width="450" height="380" viewBox="0 0 500 400" fill="none" xmlns="http://www.w3.org/2000/svg" class="img-fluid" alt="CloudNote illustration">
+                    <defs>
+                        <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.8"/>
+                            <stop offset="100%" stop-color="#6366f1" stop-opacity="0.8"/>
+                        </linearGradient>
+                        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+                            <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#0ea5e9" flood-opacity="0.25"/>
+                        </filter>
+                    </defs>
+                    <!-- Floating Spheres -->
+                    <circle cx="90" cy="120" r="25" fill="#818cf8" opacity="0.3" filter="url(#shadow)"/>
+                    <circle cx="410" cy="280" r="18" fill="#38bdf8" opacity="0.4" filter="url(#shadow)"/>
+                    <circle cx="430" cy="110" r="30" fill="url(#cloudGrad)" opacity="0.15"/>
+                    <!-- Main Cloud SVG shape -->
+                    <path d="M150 280 H350 C377.6 280 400 257.6 400 230 C400 205.6 382.5 185.3 359 180.8 C357.7 141.9 325.7 110 286 110 C264.4 110 245.1 119.5 232.2 134.5 C221.7 122.3 205.8 114.5 188 114.5 C156 114.5 129.5 137.9 125.7 168.7 C105.3 173.5 90 191.7 90 213.5 C90 250.2 116.8 280 150 280 Z" fill="url(#cloudGrad)" filter="url(#shadow)"/>
+                    <!-- Documents overlapping -->
+                    <rect x="200" y="170" width="70" height="95" rx="8" fill="#ffffff" opacity="0.95" filter="url(#shadow)"/>
+                    <rect x="235" y="190" width="70" height="95" rx="8" fill="#f8fafc" opacity="0.9" filter="url(#shadow)"/>
+                    <line x1="215" y1="195" x2="255" y2="195" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="215" y1="210" x2="245" y2="210" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="215" y1="225" x2="250" y2="225" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="250" y1="215" x2="290" y2="215" stroke="#0ea5e9" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="250" y1="230" x2="280" y2="230" stroke="#6366f1" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="250" y1="245" x2="275" y2="245" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+                    <!-- Download arrow symbol overlay -->
+                    <circle cx="270" cy="140" r="28" fill="#10b981" filter="url(#shadow)"/>
+                    <path d="M270 128 V148 M263 141 L270 148 L277 141" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Notes Catalog Section -->
+<section class="container py-5" id="explore-section">
+    <!-- Section Heading -->
+    <div class="row mb-4">
+        <div class="col-12 text-center text-md-start">
+            <h2 class="fw-bold mb-1">Explore Study Notes</h2>
+            <p class="text-secondary small">Filter and find exact resources matching your curriculum requirements.</p>
+        </div>
+    </div>
+
+    <!-- Search and Filters bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="glass-panel p-3 rounded-4">
+                <form method="GET" action="{% url 'index' %}" class="search-form row g-2">
+                    <div class="col-md-7">
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-0 text-secondary"><i class="bi bi-search"></i></span>
+                            <input type="text" name="search" class="form-control bg-transparent border-0 text-primary" placeholder="Search by title, description or tag..." value="{{ search_query }}" id="search-input">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="subject" class="form-select bg-transparent border-0 text-secondary" id="subject-select">
+                            <option value="">All Subjects</option>
+                            <option value="Computer Science" {% if selected_subject == "Computer Science" %}selected{% endif %}>Computer Science</option>
+                            <option value="Mathematics" {% if selected_subject == "Mathematics" %}selected{% endif %}>Mathematics</option>
+                            <option value="Physics" {% if selected_subject == "Physics" %}selected{% endif %}>Physics</option>
+                            <option value="Chemistry" {% if selected_subject == "Chemistry" %}selected{% endif %}>Chemistry</option>
+                            <option value="Engineering" {% if selected_subject == "Engineering" %}selected{% endif %}>Engineering</option>
+                            <option value="Business & Economics" {% if selected_subject == "Business & Economics" %}selected{% endif %}>Business & Economics</option>
+                            <option value="Humanities & Social Sciences" {% if selected_subject == "Humanities & Social Sciences" %}selected{% endif %}>Humanities & Social Sciences</option>
+                            <option value="Other" {% if selected_subject == "Other" %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-premium w-100 py-2" id="search-submit-btn">Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Pill Subjects Navigation -->
+    <div class="row">
+        <div class="col-12">
+            <div class="filter-pills-container">
+                <a href="{% url 'index' %}" class="pill-item {% if not selected_subject %}active{% endif %}">All Categories</a>
+                <a href="{% url 'index' %}?subject=Computer+Science" class="pill-item {% if selected_subject == 'Computer Science' %}active{% endif %}">Computer Science</a>
+                <a href="{% url 'index' %}?subject=Mathematics" class="pill-item {% if selected_subject == 'Mathematics' %}active{% endif %}">Mathematics</a>
+                <a href="{% url 'index' %}?subject=Physics" class="pill-item {% if selected_subject == 'Physics' %}active{% endif %}">Physics</a>
+                <a href="{% url 'index' %}?subject=Chemistry" class="pill-item {% if selected_subject == 'Chemistry' %}active{% endif %}">Chemistry</a>
+                <a href="{% url 'index' %}?subject=Engineering" class="pill-item {% if selected_subject == 'Engineering' %}active{% endif %}">Engineering</a>
+                <a href="{% url 'index' %}?subject=Business+%26+Economics" class="pill-item {% if selected_subject == 'Business & Economics' %}active{% endif %}">Business & Economics</a>
+                <a href="{% url 'index' %}?subject=Other" class="pill-item {% if selected_subject == 'Other' %}active{% endif %}">Other</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Cards Grid -->
+    <div class="row g-4" id="notes-cards-grid">
+        {% if notes %}
+            {% for note in notes %}
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <div class="glass-panel note-card">
+                        <div class="note-card-body">
+                            <!-- Header Icon based on format -->
+                            <div class="note-icon-container">
+                                <i class="bi {{ note.icon_class }}"></i>
+                            </div>
+
+                            <!-- Subject Badge & Ratings -->
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-primary-subtle text-primary-emphasis small">{{ note.subject }}</span>
+                                <div class="text-warning small d-flex align-items-center gap-1">
+                                    <i class="bi bi-star-fill"></i>
+                                    <span class="fw-bold text-primary-emphasis">{{ note.average_rating }}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Note Title -->
+                            <h5 class="note-title" title="{{ note.title }}">{{ note.title }}</h5>
+                            
+                            <!-- Note Description -->
+                            <p class="note-desc">
+                                {% if note.description %}
+                                    {{ note.description }}
+                                {% else %}
+                                    No description provided for this study resource.
+                                {% endif %}
+                            </p>
+
+                            <!-- Note Meta Specifications -->
+                            <div class="note-meta mb-3">
+                                <div><i class="bi bi-file-earmark"></i> {{ note.file_type|upper }}</div>
+                                <div><i class="bi bi-hdd"></i> {{ note.formatted_size }}</div>
+                                <div><i class="bi bi-person"></i> {{ note.uploaded_by.username }}</div>
+                                <div><i class="bi bi-download"></i> {{ note.downloads }} dl</div>
+                            </div>
+                            
+                            <!-- View Details & Preview Button -->
+                            <a href="{% url 'note_detail' note.id %}" class="btn btn-premium w-100 py-2 rounded-3 mt-auto fs-7" id="note-card-btn-{{ note.id }}">
+                                <i class="bi bi-eye-fill me-1"></i> View & Preview
+                            </a>
+                            <small class="text-secondary-subtle x-small text-center d-block mt-2">Published: {{ note.created_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-clipboard-x text-secondary fs-1"></i>
+                </div>
+                <h4 class="fw-semibold text-secondary">No notes found</h4>
+                <p class="text-secondary-subtle small mb-4">Try using other search query keywords or filter terms.</p>
+                <a href="{% url 'index' %}" class="btn btn-premium py-2 px-4">Reset Filters</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

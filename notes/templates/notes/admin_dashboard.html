@@ -1,0 +1,128 @@
+{% extends 'notes/base.html' %}
+{% block title %}Admin Panel - CloudNote{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="glass-panel p-4 rounded-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <h2 class="fw-bold mb-1 text-warning"><i class="bi bi-shield-lock-fill me-2"></i> Admin Portal</h2>
+                    <p class="text-secondary small mb-0">Monitor uploads, moderate inappropriate contents, and view system analytics.</p>
+                </div>
+                <div class="badge bg-warning text-dark px-3 py-2 fs-6 align-self-start align-self-md-center">
+                    Administrator access
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Dashboard -->
+    <div class="row g-4 mb-5" id="admin-stats-row">
+        <div class="col-md-4">
+            <div class="glass-panel stat-card">
+                <div class="stat-icon stat-icon-users">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ total_users }}</div>
+                    <div class="stat-label">Registered Students</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="glass-panel stat-card">
+                <div class="stat-icon stat-icon-notes">
+                    <i class="bi bi-file-earmark-text-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ total_notes }}</div>
+                    <div class="stat-label">Total Notes</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="glass-panel stat-card">
+                <div class="stat-icon stat-icon-downloads">
+                    <i class="bi bi-cloud-arrow-down-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ total_downloads }}</div>
+                    <div class="stat-label">Total Downloads</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- All Notes Table for Moderation -->
+    <div class="row">
+        <div class="col-12">
+            <div class="glass-panel p-4 rounded-4">
+                <h3 class="fw-bold mb-4">Moderate Notes Repository</h3>
+
+                {% if notes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" id="admin-moderation-table">
+                            <thead>
+                                <tr class="text-secondary">
+                                    <th scope="col">Title</th>
+                                    <th scope="col">Uploaded By</th>
+                                    <th scope="col">Subject</th>
+                                    <th scope="col">Format</th>
+                                    <th scope="col">Size</th>
+                                    <th scope="col">Uploaded On</th>
+                                    <th scope="col">Downloads</th>
+                                    <th scope="col" class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for note in notes %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="bi {{ note.icon_class }} fs-4"></i>
+                                                <div>
+                                                    <span class="fw-semibold d-block text-primary-emphasis">{{ note.title }}</span>
+                                                    {% if note.description %}
+                                                        <small class="text-secondary-subtle d-block text-truncate" style="max-width: 250px;">{{ note.description }}</small>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <span class="fw-medium text-primary-emphasis d-block">{{ note.uploaded_by.username }}</span>
+                                                <small class="text-secondary-subtle d-block">{{ note.uploaded_by.email }}</small>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge bg-secondary-subtle text-secondary-emphasis">{{ note.subject }}</span></td>
+                                        <td><span class="badge bg-primary-subtle text-primary-emphasis">{{ note.file_type|upper }}</span></td>
+                                        <td>{{ note.formatted_size }}</td>
+                                        <td>{{ note.created_at|date:"M d, Y" }}</td>
+                                        <td><i class="bi bi-download text-success me-1"></i> {{ note.downloads }}</td>
+                                        <td class="text-end">
+                                            <form action="{% url 'admin_delete_note' note.id %}" method="post" class="d-inline" onsubmit="return confirm('Moderator Warning: Are you sure you want to FORCE DELETE this note?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-outline-danger btn-sm border-0 rounded-3 py-2 px-3">
+                                                    <i class="bi bi-trash3-fill me-1"></i> Moderate Delete
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-folder-x text-secondary fs-1"></i>
+                        <h5 class="fw-semibold mt-3 text-secondary">No notes in database</h5>
+                        <p class="text-secondary-subtle small mb-0">All notes uploaded by users will appear here for management.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

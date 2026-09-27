@@ -1,0 +1,65 @@
+{% extends 'notes/base.html' %}
+{% block title %}Upload College Notes - CloudNote{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="glass-panel p-4 p-md-5 rounded-4">
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex p-3 rounded-circle bg-primary-subtle text-primary mb-3">
+                        <i class="bi bi-cloud-arrow-up-fill fs-1"></i>
+                    </div>
+                    <h2 class="fw-bold">Upload Your Notes</h2>
+                    <p class="text-secondary small">Share your college notes to help peer students across the globe.</p>
+                </div>
+
+                <form method="POST" action="{% url 'upload' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="form-floating-custom mb-3">
+                        <label for="title">Document Title</label>
+                        <input type="text" name="title" id="title" placeholder="e.g., Data Structures Lecture Notes" required maxlength="150">
+                    </div>
+
+                    <div class="form-floating-custom mb-3">
+                        <label for="subject">Subject / Category</label>
+                        <select name="subject" id="subject" required>
+                            <option value="" disabled selected>Select a subject</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Mathematics">Mathematics</option>
+                            <option value="Physics">Physics</option>
+                            <option value="Chemistry">Chemistry</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="Business & Economics">Business & Economics</option>
+                            <option value="Humanities & Social Sciences">Humanities & Social Sciences</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-floating-custom mb-4">
+                        <label for="description">Short Description (Optional)</label>
+                        <textarea name="description" id="description" rows="3" placeholder="Provide context about what this note covers..." maxlength="500"></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-secondary small fw-bold mb-2">Upload PDF or DOCX File</label>
+                        <div id="upload-dropzone" class="upload-dropzone">
+                            <i class="bi bi-file-earmark-arrow-up upload-icon"></i>
+                            <h5 class="fw-semibold mb-1">Drag & Drop file here</h5>
+                            <p class="text-secondary small mb-0">or click to browse local files</p>
+                            <p class="text-secondary-subtle x-small mt-2 mb-0">Maximum file size: 10MB. Allowed extensions: PDF, DOCX</p>
+                            <input type="file" name="file" id="file-input" class="file-input-hidden" accept=".pdf,.docx" required>
+                        </div>
+                        <div id="upload-filename" class="text-muted small mt-2" style="display:none;"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-premium w-100 py-3 rounded-3" id="upload-submit-btn">
+                        Publish Note
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

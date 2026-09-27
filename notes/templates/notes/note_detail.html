@@ -1,0 +1,223 @@
+{% extends 'notes/base.html' %}
+{% block title %}{{ note.title }} - CloudNote{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Back Navigation -->
+    <div class="mb-4">
+        <a href="{% url 'index' %}" class="btn btn-premium-outline py-2 px-3">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="row g-4">
+        <!-- Document Viewer (Left Column) -->
+        <div class="col-lg-8">
+            <div class="glass-panel p-4 rounded-4 h-100 d-flex flex-column">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="note-icon-container mb-0">
+                            <i class="bi {{ note.icon_class }}"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-1">{{ note.title }}</h3>
+                            <span class="badge bg-primary-subtle text-primary-emphasis">{{ note.subject }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview container -->
+                <div class="flex-grow-1 border border-secondary-subtle rounded-3 bg-dark overflow-hidden position-relative" style="min-height: 500px;">
+                    {% if note.file_type == 'pdf' %}
+                        <!-- PDF Preview Iframe -->
+                        <iframe src="{{ note.file.url }}#toolbar=0" width="100%" height="100%" style="position: absolute; top:0; left:0; border: none;"></iframe>
+                    {% else %}
+                        <!-- DOCX Preview Placeholder -->
+                        <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-5 text-white">
+                            <i class="bi bi-file-earmark-word-fill text-primary display-1 mb-4"></i>
+                            <h4 class="fw-bold">Online Word Document Preview</h4>
+                            <p class="text-secondary small max-width-500 mb-4" style="max-width: 450px;">
+                                Previews for Microsoft Word files are not rendered directly in-browser. Please download the document using the link on the right to review it locally.
+                            </p>
+                            <a href="{% url 'download' note.id %}" class="btn btn-premium px-4 py-3">
+                                <i class="bi bi-cloud-arrow-down-fill me-2"></i> Download File
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Metadata & Reviews (Right Column) -->
+        <div class="col-lg-4">
+            <!-- Info Card -->
+            <div class="glass-panel p-4 rounded-4 mb-4">
+                <h4 class="fw-bold mb-3">Document Details</h4>
+                
+                <!-- Ratings Summary -->
+                <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom border-secondary-subtle">
+                    <div class="text-warning fs-4">
+                        {% for i in note.star_range.full %}
+                            <i class="bi bi-star-fill"></i>
+                        {% endfor %}
+                        {% for i in note.star_range.empty %}
+                            <i class="bi bi-star"></i>
+                        {% endfor %}
+                    </div>
+                    <span class="fw-bold fs-5">{{ note.average_rating }}</span>
+                    <span class="text-secondary small">({{ note.review_count }} review{{ note.review_count|pluralize }})</span>
+                </div>
+
+                <!-- Info List -->
+                <div class="d-flex flex-column gap-3 mb-4">
+                    <div class="d-flex justify-content-between">
+                        <span class="text-secondary small">Uploaded By</span>
+                        <span class="fw-semibold">{{ note.uploaded_by.username }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-secondary small">Date Published</span>
+                        <span class="fw-semibold">{{ note.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-secondary small">File Size</span>
+                        <span class="fw-semibold">{{ note.formatted_size }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-secondary small">File Format</span>
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis">{{ note.file_type|upper }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-secondary small">Total Downloads</span>
+                        <span class="fw-semibold"><i class="bi bi-download text-success"></i> {{ note.downloads }}</span>
+                    </div>
+                </div>
+
+                {% if note.description %}
+                    <div class="mb-4">
+                        <label class="form-label text-secondary small fw-bold">Description</label>
+                        <p class="text-secondary small mb-0">{{ note.description }}</p>
+                    </div>
+                {% endif %}
+
+                <a href="{% url 'download' note.id %}" class="btn btn-premium w-100 py-3 rounded-3" id="detail-download-btn">
+                    <i class="bi bi-cloud-arrow-down-fill me-2"></i> Download Notes Document
+                </a>
+            </div>
+
+            <!-- Reviews System -->
+            <div class="glass-panel p-4 rounded-4">
+                <h4 class="fw-bold mb-3">Student Reviews</h4>
+
+                <!-- Add Review Section -->
+                <div class="mb-4 pb-4 border-bottom border-secondary-subtle">
+                    {% if user.is_authenticated %}
+                        {% if user_has_reviewed %}
+                            <div class="alert alert-secondary py-2 small text-center mb-0" role="alert">
+                                <i class="bi bi-info-circle me-1"></i> You have already reviewed this note.
+                            </div>
+                        {% else %}
+                            <h5 class="fw-semibold mb-2 fs-6">Submit Your Feedback</h5>
+                            <form method="POST" action="{% url 'add_review' note.id %}" id="review-form">
+                                {% csrf_token %}
+                                
+                                <div class="mb-3">
+                                    <label class="form-label text-secondary small fw-bold d-block mb-1">Your Rating</label>
+                                    <div class="d-flex gap-2 fs-4 text-warning" id="rating-star-container">
+                                        <i class="bi bi-star rating-star-choice" data-value="1" style="cursor: pointer;"></i>
+                                        <i class="bi bi-star rating-star-choice" data-value="2" style="cursor: pointer;"></i>
+                                        <i class="bi bi-star rating-star-choice" data-value="3" style="cursor: pointer;"></i>
+                                        <i class="bi bi-star rating-star-choice" data-value="4" style="cursor: pointer;"></i>
+                                        <i class="bi bi-star rating-star-choice" data-value="5" style="cursor: pointer;"></i>
+                                    </div>
+                                    <input type="hidden" name="rating" id="rating-score-input" required>
+                                </div>
+
+                                <div class="form-floating-custom mb-3">
+                                    <label for="comment">Review Comments (Optional)</label>
+                                    <textarea name="comment" id="comment" rows="2" placeholder="Write feedback... (e.g., covers exam topics perfectly)" maxlength="500"></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-premium w-100 py-2 rounded-3 btn-sm">
+                                    Submit Review
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-info py-2 small text-center mb-0" role="alert">
+                            <i class="bi bi-info-circle me-1"></i> Please <a href="{% url 'login' %}?next={{ request.path }}" class="alert-link text-decoration-none">sign in</a> to submit review feedback.
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Feed of reviews -->
+                <div class="reviews-feed overflow-y-auto" style="max-height: 350px;">
+                    {% if reviews %}
+                        <div class="d-flex flex-column gap-3">
+                            {% for r in reviews %}
+                                <div class="border-bottom border-secondary-subtle pb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="fw-semibold text-primary-emphasis small">{{ r.user.username }}</span>
+                                        <small class="text-secondary-subtle x-small">{{ r.created_at|date:"M d, Y" }}</small>
+                                    </div>
+                                    <div class="text-warning mb-1" style="font-size: 0.8rem;">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= r.rating %}
+                                                <i class="bi bi-star-fill"></i>
+                                            {% else %}
+                                                <i class="bi bi-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    {% if r.comment %}
+                                        <p class="text-secondary small mb-0">{{ r.comment }}</p>
+                                    {% else %}
+                                        <p class="text-secondary x-small italic mb-0">No written comment.</p>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4 text-secondary">
+                            <i class="bi bi-chat-left-dots text-secondary-subtle fs-3"></i>
+                            <p class="small mt-2 mb-0">No feedback reviews yet.</p>
+                            <small class="text-secondary-subtle x-small">Be the first to share your review!</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Star Rating click triggers
+    document.addEventListener('DOMContentLoaded', () => {
+        const starContainer = document.getElementById('rating-star-container');
+        const scoreInput = document.getElementById('rating-score-input');
+        
+        if (!starContainer || !scoreInput) return;
+        
+        const stars = starContainer.querySelectorAll('.rating-star-choice');
+        
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const score = star.getAttribute('data-value');
+                scoreInput.value = score;
+                
+                // Color active stars
+                stars.forEach(s => {
+                    const sVal = s.getAttribute('data-value');
+                    if (parseInt(sVal) <= parseInt(score)) {
+                        s.classList.remove('bi-star');
+                        s.classList.add('bi-star-fill');
+                    } else {
+                        s.classList.remove('bi-star-fill');
+                        s.classList.add('bi-star');
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

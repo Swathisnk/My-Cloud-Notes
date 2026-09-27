@@ -1,0 +1,37 @@
+name: CloudNote CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Validate Django Settings and Check Syntax
+      run: |
+        python manage.py check
+
+    - name: Run Django Migrations Dry Run
+      run: |
+        python manage.py makemigrations --check --dry-run
+
+    - name: Build Docker Image
+      run: |
+        docker build -t cloudnote-app:latest .

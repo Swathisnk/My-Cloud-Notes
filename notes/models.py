@@ -5,15 +5,36 @@ import os
 
 class Note(models.Model):
     SUBJECT_CHOICES = [
-        ('Computer Science', 'Computer Science'),
-        ('Mathematics', 'Mathematics'),
-        ('Physics', 'Physics'),
-        ('Chemistry', 'Chemistry'),
-        ('Engineering', 'Engineering'),
-        ('Business & Economics', 'Business & Economics'),
-        ('Humanities & Social Sciences', 'Humanities & Social Sciences'),
-        ('Other', 'Other'),
-    ]
+    ('Computer Science', 'Computer Science'),
+    ('Mathematics', 'Mathematics'),
+    ('Physics', 'Physics'),
+    ('Chemistry', 'Chemistry'),
+
+    # Engineering Subjects
+    ('Engineering Graphics', 'Engineering Graphics'),
+    ('Programming in C', 'Programming in C'),
+    ('Python Programming', 'Python Programming'),
+    ('Data Structures', 'Data Structures'),
+    ('Object Oriented Programming', 'Object Oriented Programming'),
+    ('Database Management Systems', 'Database Management Systems'),
+    ('Operating Systems', 'Operating Systems'),
+    ('Computer Networks', 'Computer Networks'),
+    ('Software Engineering', 'Software Engineering'),
+    ('Web Technologies', 'Web Technologies'),
+    ('Design and Analysis of Algorithms', 'Design and Analysis of Algorithms'),
+    ('Computer Organization', 'Computer Organization'),
+    ('Artificial Intelligence', 'Artificial Intelligence'),
+    ('Machine Learning', 'Machine Learning'),
+    ('Cloud Computing', 'Cloud Computing'),
+    ('Cyber Security', 'Cyber Security'),
+    ('Internet of Things', 'Internet of Things'),
+    ('Engineering Economics', 'Engineering Economics'),
+    ('Environmental Studies', 'Environmental Studies'),
+
+    ('Business & Economics', 'Business & Economics'),
+    ('Humanities & Social Sciences', 'Humanities & Social Sciences'),
+    ('Other', 'Other'),
+]
 
     title = models.CharField(max_length=150)
     description = models.TextField(max_length=500, blank=True)
